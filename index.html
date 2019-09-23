@@ -7,11 +7,42 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="assets/css/style.css">
     <title>Skyrim Trivia</title>
   </head>
   <body>
-    
+
+    <main class="container mt-5 opaque-background">
+        <div class="row">
+            <div class="col-10 mt-5 mb-5 mx-auto">
+                <header class="row">
+                    <div class="col-10 mx-auto text-center">
+                        <h1>Skyrim Trivia</h1>
+                    </div>
+                </header>
+                <section class="row">
+                    <div class="col-10 mt-3 mb-3 mx-auto text-center">
+                        <h3 class="timer"></h3>
+                    </div>
+                </section>
+                <section class="row">
+                    <div class="game col-10 mx-auto text-center">
+                        <h2 class="question"></h2>
+                        <button type="button" class="answer1 btn btn-secondary btn-block btn-opacity mt-3"></button>
+                        <button type="button" class="answer2 btn btn-secondary btn-block btn-opacity mt-3"></button>
+                        <button type="button" class="answer3 btn btn-secondary btn-block btn-opacity mt-3"></button>
+                        <button type="button" class="answer4 btn btn-secondary btn-block btn-opacity mt-3"></button>
+                    </div>
+                </section>
+                <section class="row">
+                    <div class="instructions col-10 mx-auto text-center">
+                        <h2 class="instruction-text"></h2>
+                        <button type="button" class="do-next btn btn-secondary btn-block btn-opacity mt-3"></button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

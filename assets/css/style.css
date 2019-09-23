@@ -2,3 +2,11 @@ body {
     background: url("../images/skyrim_background.jpg") no-repeat center center fixed;
     background-size: cover;
 }
+
+.opaque-background {
+    background: rgba(248, 249, 250, 0.65);
+}
+
+.btn-opacity {
+    opacity: 0.75;
+}
