@@ -58,23 +58,17 @@ var SkyrimTrivia = function () {
         },
     ];
 
-    const timePerGame = 30000;
-
-    var time = 0;
-    // var timerId = setInterval(count, 0);
+    var time = 30;
+    var timerId;
     var clockRunning = false;
     var currentQuestion;
     var askedQuestions = [];
-
-    // function count() {
-    //     time++;
-    // }
+    var timerText = $("#timer");
 
     return {
 
         startGame: function () {
-            time = 0;
-            // clearInterval(timerId);
+            time = 30;
             clockRunning = false;
             currentQuestion = { blankObject: "" };
             askedQuestions = [];
@@ -97,7 +91,7 @@ var SkyrimTrivia = function () {
         // Start the timer of the game.
         startTimer: function () {
             if (!clockRunning) {
-                timerId = setInterval(count, 1000);
+                timerId = setInterval(this.count, 1000);
                 clockRunning = true;
             }
         },
@@ -106,6 +100,13 @@ var SkyrimTrivia = function () {
         stopTimer: function () {
             clearInterval(timerId);
             clockRunning = false;
+            timerText.text("Time Remaining: " + time);
+        },
+
+        // Increment the time.
+        count: function () {
+            time--;
+            timerText.text("Time Remaining: " + time);
         },
 
         // Return the currentQuestion.
@@ -113,23 +114,25 @@ var SkyrimTrivia = function () {
             return currentQuestion;
         },
 
+        getCurrentTime: function () {
+            return time;
+        }
+
     }
 };
 
 $(document).ready(function () {
-    var timerText = $("#timer");
-    var questionText = $("#question");
     var instructionsText = $("#instruction-text");
-    var instructionsDiv = $("#instructions");
     var gameDiv = $("#game")
+    var timerText = $("#timer");
 
     var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
 
     var game = new SkyrimTrivia();
 
     startScreen();
-    console.log("Game started");
 
+    // When the screen is loaded, print the instructions and post the Start button.
     function startScreen() {
         instructionsText.html("You will have 30 seconds to complete 8 questions<br><br>Press Start to begin the Trivia<br><br>");
 
@@ -137,31 +140,42 @@ $(document).ready(function () {
         startButton.addClass(buttonClasses);
         startButton.attr("id", "start-button");
         startButton.html("Start");
-        startButton.click(function() {
+        startButton.click(function () {
             beginGame();
         });
 
-        instructionsDiv.append(startButton);
+        gameDiv.append(startButton);
     }
 
+    // When the Start button is clicked (or the game is reset), start the game and post the first question.
     function beginGame() {
-        console.log("Start button clicked.");
         instructionsText.empty();
         $("#start-button").remove();
         game.startGame();
         postQuestion();
+        timerText.text("Time Remaining: " + game.getCurrentTime());
+        game.startTimer();
     }
 
+    // To post a question, get the current question and create a button for each of the answers.
     function postQuestion() {
         var theQuestion = game.getCurrentQuestion();
-        questionText.html(theQuestion.question);
+        instructionsText.html(theQuestion.question);
         for (property in theQuestion) {
             if (property !== "question") {
                 var questionButton = $("<button>");
                 questionButton.addClass(buttonClasses);
                 questionButton.html(theQuestion[property]);
+                questionButton.click(function () {
+                    checkAnswer();
+                });
                 gameDiv.append(questionButton);
             }
         }
+    }
+
+    // Check the answer that was chosen.
+    function checkAnswer() {
+        game.stopTimer();
     }
 })
