@@ -1,5 +1,5 @@
-var SkyrimTrivia = {
-    questions: [
+var SkyrimTrivia = function () {
+    var questions = [
         {
             question: "What were the Falmer known as in ancient times?",
             answer1: "Cave Dwellers",
@@ -56,7 +56,112 @@ var SkyrimTrivia = {
             answer3: "I'd be a lot warmer and a lot happier with a bellyful of mead...",
             correct: "I used to be an adventurer like you, then I took an arrow to the knee.",
         },
-    ],
+    ];
 
-    
+    const timePerGame = 30000;
+
+    var time = 0;
+    // var timerId = setInterval(count, 0);
+    var clockRunning = false;
+    var currentQuestion;
+    var askedQuestions = [];
+
+    // function count() {
+    //     time++;
+    // }
+
+    return {
+
+        startGame: function () {
+            time = 0;
+            // clearInterval(timerId);
+            clockRunning = false;
+            currentQuestion = { blankObject: "" };
+            askedQuestions = [];
+
+            this.pickRandomQuestion();
+        },
+
+        // Picks a random question from the questions list. If the new question has already been asked,
+        // it will pick a new question.
+        pickRandomQuestion: function () {
+            if (currentQuestion !== undefined) {
+                askedQuestions.push(currentQuestion);
+            }
+            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            while (askedQuestions.indexOf(currentQuestion) > -1) {
+                currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            }
+        },
+
+        // Start the timer of the game.
+        startTimer: function () {
+            if (!clockRunning) {
+                timerId = setInterval(count, 1000);
+                clockRunning = true;
+            }
+        },
+
+        // Stop the timer of the game.
+        stopTimer: function () {
+            clearInterval(timerId);
+            clockRunning = false;
+        },
+
+        // Return the currentQuestion.
+        getCurrentQuestion: function () {
+            return currentQuestion;
+        },
+
+    }
 };
+
+$(document).ready(function () {
+    var timerText = $("#timer");
+    var questionText = $("#question");
+    var instructionsText = $("#instruction-text");
+    var instructionsDiv = $("#instructions");
+    var gameDiv = $("#game")
+
+    var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
+
+    var game = new SkyrimTrivia();
+
+    startScreen();
+    console.log("Game started");
+
+    function startScreen() {
+        instructionsText.html("You will have 30 seconds to complete 8 questions<br><br>Press Start to begin the Trivia<br><br>");
+
+        var startButton = $("<button>");
+        startButton.addClass(buttonClasses);
+        startButton.attr("id", "start-button");
+        startButton.html("Start");
+        startButton.click(function() {
+            beginGame();
+        });
+
+        instructionsDiv.append(startButton);
+    }
+
+    function beginGame() {
+        console.log("Start button clicked.");
+        instructionsText.empty();
+        $("#start-button").remove();
+        game.startGame();
+        postQuestion();
+    }
+
+    function postQuestion() {
+        var theQuestion = game.getCurrentQuestion();
+        questionText.html(theQuestion.question);
+        for (property in theQuestion) {
+            if (property !== "question") {
+                var questionButton = $("<button>");
+                questionButton.addClass(buttonClasses);
+                questionButton.html(theQuestion[property]);
+                gameDiv.append(questionButton);
+            }
+        }
+    }
+})
