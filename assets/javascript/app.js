@@ -6,6 +6,7 @@ var SkyrimTrivia = function () {
             answer2: "Skyrim Elves",
             answer3: "People of Mereth",
             correct: "Snow Elves",
+            gif: "assets/images/falmer.gif",
         },
         {
             question: "Who was the first human to arrive in Skyrim?",
@@ -13,6 +14,7 @@ var SkyrimTrivia = function () {
             answer2: "Kyne",
             answer3: "Yngol",
             correct: "Ysgramor",
+            gif: "assets/images/ysgramor.gif",
         },
         {
             question: "Who is someone you can encounter on the roads of Skyrim, as well as in other Elder Scrolls games?",
@@ -20,6 +22,7 @@ var SkyrimTrivia = function () {
             answer2: "Balbus",
             answer3: "Sond and Bottar",
             correct: "M'aiq the Liar",
+            gif: "assets/images/maiqtheliar.gif",
         },
         {
             question: "Who is the leader of the Stormcloak Rebellion?",
@@ -27,6 +30,7 @@ var SkyrimTrivia = function () {
             answer2: "High King Torygg",
             answer3: "Galmar Stone-Fist",
             correct: "Ulfric Stormcloak",
+            gif: "assets/images/ulfric.gif",
         },
         {
             question: "When was the last time that the Greybeards spoke?",
@@ -34,6 +38,7 @@ var SkyrimTrivia = function () {
             answer2: "When they defeated the Dragon God of Time, Akatosh",
             answer3: "When they settled their seat of power, High Hrothgar",
             correct: "When they announced the greatness of Tiber Septim I",
+            gif: "assets/images/greybeards.gif",
         },
         {
             question: "Why does Anise, the sweet old Nord lady, attack you?",
@@ -41,6 +46,7 @@ var SkyrimTrivia = function () {
             answer2: "Because you killed her grandson, Hern",
             answer3: "Because you told her her sweet rolls weren't good",
             correct: "Because you stole from her or entered her cellar",
+            gif: "assets/images/sweetroll.gif",
         },
         {
             question: "If you follow the road to Riverwood after escaping Helgen, what are the three Standing Stones you encounter?",
@@ -48,6 +54,7 @@ var SkyrimTrivia = function () {
             answer2: "The Shadow, The Warrior, and The Apprentice",
             answer3: "The Atronach, The Thief, and The Ritual",
             correct: "The Thief, The Warrior, and The Mage",
+            gif: "assets/images/riverwood.gif",
         },
         {
             question: "What are guards most famous for saying?",
@@ -55,6 +62,7 @@ var SkyrimTrivia = function () {
             answer2: "No lollygaggin'.",
             answer3: "I'd be a lot warmer and a lot happier with a bellyful of mead...",
             correct: "I used to be an adventurer like you, then I took an arrow to the knee.",
+            gif: "assets/images/guard.gif",
         },
     ];
 
@@ -126,12 +134,13 @@ $(document).ready(function () {
     var gameDiv = $("#game")
     var timerText = $("#timer");
 
-    const totalTime = 5;
+    const totalTime = 30;
     var currentTime = 0;
     var timerId;
     var clockRunning = false;
 
     var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
+    var buttonStyle = "font-size: 1.5rem;";
 
     var game = new SkyrimTrivia();
 
@@ -141,12 +150,14 @@ $(document).ready(function () {
     function startScreen() {
         currentTime = totalTime;
         $("button").remove(); // Remove all buttons from the html.
+        $("img").remove();
         instructionsText.html("You will have " + currentTime + " seconds to complete " + game.questionsLimit +
             " questions<br><br>Press Start to begin the Trivia<br><br>");
 
         var startButton = $("<button>");
         startButton.addClass(buttonClasses);
         startButton.attr("id", "start-button");
+        startButton.attr("style", buttonStyle);
         startButton.html("Start");
         startButton.click(function () {
             beginGame();
@@ -194,13 +205,14 @@ $(document).ready(function () {
     // To post a question, get the current question and create a button for each of the answers.
     // Start the timer for the question.
     function postQuestion() {
+        $("img").remove();
         var theQuestion = game.getCurrentQuestion(); // Get the current question.
         instructionsText.html(theQuestion.question); // Set the instruction text to what the question is.
 
         // For each property in theQuestion object (excluding the question itself) add it to an array.
         var answers = [];
         for (property in theQuestion) {
-            if (property !== "question") {
+            if (property !== "question" && property !== "gif") {
                 answers.push(theQuestion[property]);
             }
         }
@@ -210,6 +222,7 @@ $(document).ready(function () {
             var randomIndex = Math.floor(Math.random() * answers.length);
             var questionButton = $("<button>");
             questionButton.addClass(buttonClasses);
+            questionButton.attr("style", buttonStyle);
             questionButton.html(answers[randomIndex]);
             questionButton.click(function () {
                 checkAnswer(this);
@@ -238,6 +251,10 @@ $(document).ready(function () {
             game.incrementIncorrectAnswers();
         }
 
+        var image = $("<img>");
+        image.attr("src", theQuestion.gif);
+        gameDiv.append(image);
+
         // Wait 5 seconds before posting the next question.
         var anwerTimeout = setTimeout(function () {
             game.pickRandomQuestion();
@@ -250,6 +267,7 @@ $(document).ready(function () {
         stopTimer();
         timerText.empty(); // Remove the timer text.
         $("button").remove(); // Remove all buttons from the html.
+        $("img").remove();
 
         // Calculate the number of unanswered questions.
         var unanswered = game.questionsLimit - (game.getCorrectAnswers() + game.getIncorrectAnswers());
@@ -263,6 +281,7 @@ $(document).ready(function () {
         var retryButton = $("<button>");
         retryButton.addClass(buttonClasses);
         retryButton.attr("id", "retry-button");
+        retryButton.attr("style", buttonStyle);
         retryButton.html("Retry");
         retryButton.click(function () {
             startScreen();
