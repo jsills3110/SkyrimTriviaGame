@@ -78,7 +78,6 @@ var SkyrimTrivia = function () {
 
         startGame: function () {
             numberOfQuestionsAsked = 0;
-            clockRunning = false;
             currentQuestion = { blankObject: "" };
             askedQuestions = [];
             correctAnswers = 0;
@@ -93,23 +92,33 @@ var SkyrimTrivia = function () {
             if (currentQuestion !== undefined) {
                 askedQuestions.push(currentQuestion);
             }
-            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
             if (numberOfQuestionsAsked < this.questionsLimit) {
                 while (askedQuestions.indexOf(currentQuestion) > -1) {
                     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
                 }
                 numberOfQuestionsAsked++;
+                console.log("Questions asked: " + numberOfQuestionsAsked);
+            }
+        },
+
+        checkEndCondition: function () {
+            if (numberOfQuestionsAsked >= this.questionsLimit) {
+                return true;
+            } else {
+                return false;
             }
         },
 
         // Increment the correct answers.
         incrementCorrectAnswers: function () {
             correctAnswers++;
+            console.log("Correct answers: " + correctAnswers);
         },
 
         // Increment the incorrect answers.
         incrementIncorrectAnswers: function () {
             incorrectAnswers++;
+            console.log("Incorrect answers: " + incorrectAnswers);
         },
 
         // Return the currentQuestion.
@@ -138,6 +147,7 @@ $(document).ready(function () {
     var currentTime = 0;
     var timerId;
     var clockRunning = false;
+    var gameWon = false;
 
     var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
     var buttonStyle = "font-size: 1.5rem;";
@@ -198,6 +208,7 @@ $(document).ready(function () {
         currentTime--;
         timerText.text("Time Remaining: " + currentTime);
         if (currentTime <= 0) {
+            gameWon = false;
             endGame();
         }
     }
@@ -257,8 +268,13 @@ $(document).ready(function () {
 
         // Wait 5 seconds before posting the next question.
         var anwerTimeout = setTimeout(function () {
-            game.pickRandomQuestion();
-            postQuestion();
+           
+            if (game.checkEndCondition()) {
+                endGame();
+            } else {
+                game.pickRandomQuestion();
+                postQuestion();
+            }
         }, 5000);
     }
 
@@ -273,7 +289,7 @@ $(document).ready(function () {
         var unanswered = game.questionsLimit - (game.getCorrectAnswers() + game.getIncorrectAnswers());
 
         // Post the number of correct, incorrect, and unanswered questions. 
-        instructionsText.html("Time's Up!<br><br>Correct Answers: " + game.getCorrectAnswers() +
+        instructionsText.html("Game Over!<br><br>Correct Answers: " + game.getCorrectAnswers() +
             "<br>Incorrect Answers: " + game.getIncorrectAnswers() + "<br>Unanswered: " + unanswered +
             "<br><br>Click below to try again!<br><br>");
 
