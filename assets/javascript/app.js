@@ -58,25 +58,23 @@ var SkyrimTrivia = function () {
         },
     ];
 
-    var time = 30;
-    const questionsLimit = 8;
     var numberOfQuestionsAsked = 0;
-    var timerId;
-    var clockRunning = false;
     var currentQuestion;
     var askedQuestions = [];
     var correctAnswers = 0;
     var incorrectAnswers = 0;
-    var timerText = $("#timer");
 
     return {
 
+        questionsLimit: 8,
+
         startGame: function () {
-            time = 30;
             numberOfQuestionsAsked = 0;
             clockRunning = false;
             currentQuestion = { blankObject: "" };
             askedQuestions = [];
+            correctAnswers = 0;
+            incorrectAnswers = 0;
 
             this.pickRandomQuestion();
         },
@@ -88,42 +86,20 @@ var SkyrimTrivia = function () {
                 askedQuestions.push(currentQuestion);
             }
             currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-            if (numberOfQuestionsAsked < questionsLimit) {
+            if (numberOfQuestionsAsked < this.questionsLimit) {
                 while (askedQuestions.indexOf(currentQuestion) > -1) {
                     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
                 }
                 numberOfQuestionsAsked++;
-                console.log(numberOfQuestionsAsked);
-            } else {
-                console.log("Game Done");
             }
         },
 
-        // Start the timer of the game.
-        startTimer: function () {
-            if (!clockRunning) {
-                timerId = setInterval(this.count, 1000);
-                clockRunning = true;
-            }
-        },
-
-        // Stop the timer of the game.
-        stopTimer: function () {
-            clearInterval(timerId);
-            clockRunning = false;
-            timerText.text("Time Remaining: " + time);
-        },
-
-        // Increment the time.
-        count: function () {
-            time--;
-            timerText.text("Time Remaining: " + time);
-        },
-
+        // Increment the correct answers.
         incrementCorrectAnswers: function () {
             correctAnswers++;
         },
 
+        // Increment the incorrect answers.
         incrementIncorrectAnswers: function () {
             incorrectAnswers++;
         },
@@ -133,11 +109,15 @@ var SkyrimTrivia = function () {
             return currentQuestion;
         },
 
-        // Return the current time.
-        getCurrentTime: function () {
-            return time;
-        }
+        // Return the number of correct answers.
+        getCorrectAnswers: function () {
+            return correctAnswers;
+        },
 
+        // Return the number of incorrect answers.
+        getIncorrectAnswers: function () {
+            return incorrectAnswers;
+        },
     }
 };
 
@@ -145,6 +125,11 @@ $(document).ready(function () {
     var instructionsText = $("#instruction-text");
     var gameDiv = $("#game")
     var timerText = $("#timer");
+
+    const totalTime = 5;
+    var currentTime = 0;
+    var timerId;
+    var clockRunning = false;
 
     var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
 
@@ -154,7 +139,10 @@ $(document).ready(function () {
 
     // When the screen is loaded, print the instructions and post the Start button.
     function startScreen() {
-        instructionsText.html("You will have 30 seconds to complete 8 questions<br><br>Press Start to begin the Trivia<br><br>");
+        currentTime = totalTime;
+        $("button").remove(); // Remove all buttons from the html.
+        instructionsText.html("You will have " + currentTime + " seconds to complete " + game.questionsLimit +
+            " questions<br><br>Press Start to begin the Trivia<br><br>");
 
         var startButton = $("<button>");
         startButton.addClass(buttonClasses);
@@ -173,6 +161,34 @@ $(document).ready(function () {
         $("#start-button").remove();
         game.startGame();
         postQuestion();
+    }
+
+    // Start the timer of the game.
+    function startTimer() {
+        if (!clockRunning) {
+            timerId = setInterval(count, 1000);
+            clockRunning = true;
+        }
+    }
+
+    // Stop the timer of the game.
+    function stopTimer() {
+        clearInterval(timerId);
+        clockRunning = false;
+        if (currentTime < 0) {
+            timerText.text("Time Remaining: 0");
+        } else {
+            timerText.text("Time Remaining: " + currentTime);
+        }
+    }
+
+    // Increment the time.
+    function count() {
+        currentTime--;
+        timerText.text("Time Remaining: " + currentTime);
+        if (currentTime <= 0) {
+            endGame();
+        }
     }
 
     // To post a question, get the current question and create a button for each of the answers.
@@ -203,13 +219,13 @@ $(document).ready(function () {
         }
 
         // Post the time remaining and start the timer.
-        timerText.text("Time Remaining: " + game.getCurrentTime());
-        game.startTimer();
+        timerText.text("Time Remaining: " + currentTime);
+        startTimer();
     }
 
     // Check the answer that was chosen.
     function checkAnswer(theAnswerChosen) {
-        game.stopTimer(); // Stop the timer.
+        stopTimer(); // Stop the timer.
         var theQuestion = game.getCurrentQuestion(); // Get the current question.
         $("button").remove(); // Remove all buttons from the html.
 
@@ -227,5 +243,30 @@ $(document).ready(function () {
             game.pickRandomQuestion();
             postQuestion();
         }, 5000);
+    }
+
+    // Stop the timer, show the results, and add a retry button to the screen.
+    function endGame() {
+        stopTimer();
+        timerText.empty(); // Remove the timer text.
+        $("button").remove(); // Remove all buttons from the html.
+
+        // Calculate the number of unanswered questions.
+        var unanswered = game.questionsLimit - (game.getCorrectAnswers() + game.getIncorrectAnswers());
+
+        // Post the number of correct, incorrect, and unanswered questions. 
+        instructionsText.html("Time's Up!<br><br>Correct Answers: " + game.getCorrectAnswers() +
+            "<br>Incorrect Answers: " + game.getIncorrectAnswers() + "<br>Unanswered: " + unanswered +
+            "<br><br>Click below to try again!<br><br>");
+
+        // Create a button for resetting the game and append it to the gameDiv.
+        var retryButton = $("<button>");
+        retryButton.addClass(buttonClasses);
+        retryButton.attr("id", "retry-button");
+        retryButton.html("Retry");
+        retryButton.click(function () {
+            startScreen();
+        });
+        gameDiv.append(retryButton);
     }
 })
