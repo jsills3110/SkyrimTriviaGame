@@ -59,16 +59,21 @@ var SkyrimTrivia = function () {
     ];
 
     var time = 30;
+    const questionsLimit = 8;
+    var numberOfQuestionsAsked = 0;
     var timerId;
     var clockRunning = false;
     var currentQuestion;
     var askedQuestions = [];
+    var correctAnswers = 0;
+    var incorrectAnswers = 0;
     var timerText = $("#timer");
 
     return {
 
         startGame: function () {
             time = 30;
+            numberOfQuestionsAsked = 0;
             clockRunning = false;
             currentQuestion = { blankObject: "" };
             askedQuestions = [];
@@ -83,8 +88,14 @@ var SkyrimTrivia = function () {
                 askedQuestions.push(currentQuestion);
             }
             currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-            while (askedQuestions.indexOf(currentQuestion) > -1) {
-                currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            if (numberOfQuestionsAsked < questionsLimit) {
+                while (askedQuestions.indexOf(currentQuestion) > -1) {
+                    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+                }
+                numberOfQuestionsAsked++;
+                console.log(numberOfQuestionsAsked);
+            } else {
+                console.log("Game Done");
             }
         },
 
@@ -109,11 +120,20 @@ var SkyrimTrivia = function () {
             timerText.text("Time Remaining: " + time);
         },
 
+        incrementCorrectAnswers: function () {
+            correctAnswers++;
+        },
+
+        incrementIncorrectAnswers: function () {
+            incorrectAnswers++;
+        },
+
         // Return the currentQuestion.
         getCurrentQuestion: function () {
             return currentQuestion;
         },
 
+        // Return the current time.
         getCurrentTime: function () {
             return time;
         }
@@ -153,29 +173,59 @@ $(document).ready(function () {
         $("#start-button").remove();
         game.startGame();
         postQuestion();
+    }
+
+    // To post a question, get the current question and create a button for each of the answers.
+    // Start the timer for the question.
+    function postQuestion() {
+        var theQuestion = game.getCurrentQuestion(); // Get the current question.
+        instructionsText.html(theQuestion.question); // Set the instruction text to what the question is.
+
+        // For each property in theQuestion object (excluding the question itself) add it to an array.
+        var answers = [];
+        for (property in theQuestion) {
+            if (property !== "question") {
+                answers.push(theQuestion[property]);
+            }
+        }
+
+        // In random order, create buttons for the answers and add them to the gameDiv.
+        for (var i = answers.length - 1; i >= 0; i--) {
+            var randomIndex = Math.floor(Math.random() * answers.length);
+            var questionButton = $("<button>");
+            questionButton.addClass(buttonClasses);
+            questionButton.html(answers[randomIndex]);
+            questionButton.click(function () {
+                checkAnswer(this);
+            });
+            gameDiv.append(questionButton);
+            answers.splice(randomIndex, 1);
+        }
+
+        // Post the time remaining and start the timer.
         timerText.text("Time Remaining: " + game.getCurrentTime());
         game.startTimer();
     }
 
-    // To post a question, get the current question and create a button for each of the answers.
-    function postQuestion() {
-        var theQuestion = game.getCurrentQuestion();
-        instructionsText.html(theQuestion.question);
-        for (property in theQuestion) {
-            if (property !== "question") {
-                var questionButton = $("<button>");
-                questionButton.addClass(buttonClasses);
-                questionButton.html(theQuestion[property]);
-                questionButton.click(function () {
-                    checkAnswer();
-                });
-                gameDiv.append(questionButton);
-            }
-        }
-    }
-
     // Check the answer that was chosen.
-    function checkAnswer() {
-        game.stopTimer();
+    function checkAnswer(theAnswerChosen) {
+        game.stopTimer(); // Stop the timer.
+        var theQuestion = game.getCurrentQuestion(); // Get the current question.
+        $("button").remove(); // Remove all buttons from the html.
+
+        // If the chosen answer was the correct one, tell the user it was correct.
+        if (theAnswerChosen.innerHTML === theQuestion.correct) {
+            instructionsText.html("That is correct!<br><br>" + theQuestion.correct);
+            game.incrementCorrectAnswers();
+        } else { // else tell them it was incorrect.
+            instructionsText.html("That is incorrect! The correct answer was:<br><br>" + theQuestion.correct);
+            game.incrementIncorrectAnswers();
+        }
+
+        // Wait 5 seconds before posting the next question.
+        var anwerTimeout = setTimeout(function () {
+            game.pickRandomQuestion();
+            postQuestion();
+        }, 5000);
     }
 })
