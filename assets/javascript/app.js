@@ -64,6 +64,46 @@ var SkyrimTrivia = function () {
             correct: "I used to be an adventurer like you, then I took an arrow to the knee.",
             gif: "assets/images/guard.gif",
         },
+        {
+            question: "What is the name of the horse that once belonged to Lucien Lachance?",
+            answer1: "Shadowmoon",
+            answer2: "Black Beauty",
+            answer3: "Dark Night",
+            correct: "Shadowmere",
+            gif: "assets/images/shadowmere.gif",
+        },
+        {
+            question: "Who is your Housecarl when you become Thane of Whiterun?",
+            answer1: "Argis the Bulwark",
+            answer2: "Iona",
+            answer3: "Valdimar",
+            correct: "Lydia",
+            gif: "assets/images/shadowmere.gif",
+        },
+        {
+            question: "What is Calcelmo's favorite subject of study?",
+            answer1: "Giant Spiders",
+            answer2: "The Falmer",
+            answer3: "Nirnroot",
+            correct: "The Dwemer",
+            gif: "assets/images/dwemer.gif",
+        },
+        {
+            question: "In what city can the Thieves Guild be found?",
+            answer1: "Dawnstar",
+            answer2: "Markarth",
+            answer3: "Solitude",
+            correct: "Riften",
+            gif: "assets/images/thievesguild.gif",
+        },
+        {
+            question: "Who ascended the throne after High King Torygg died?",
+            answer1: "Balgruuf the Greater",
+            answer2: "Bolgeir Bearclaw",
+            answer3: "Falk Firebeard",
+            correct: "Elisif the Fair",
+            gif: "assets/images/elisif.gif",
+        },
     ];
 
     var numberOfQuestionsAsked = 0;
@@ -143,7 +183,7 @@ $(document).ready(function () {
     var gameDiv = $("#game")
     var timerText = $("#timer");
 
-    const totalTime = 30;
+    const totalTime = 45;
     var currentTime = 0;
     var timerId;
     var clockRunning = false;
@@ -162,7 +202,7 @@ $(document).ready(function () {
         $("button").remove(); // Remove all buttons from the html.
         $("img").remove();
         instructionsText.html("You will have " + currentTime + " seconds to complete " + game.questionsLimit +
-            " questions<br><br>Press Start to begin the Trivia<br><br>");
+            " random questions.<br><br>Press Start to begin the Trivia<br><br>");
 
         var startButton = $("<button>");
         startButton.addClass(buttonClasses);
