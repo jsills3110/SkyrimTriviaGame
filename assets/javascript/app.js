@@ -140,6 +140,7 @@ var SkyrimTrivia = function () {
             }
         },
 
+        // Check if the number of questions asked is equal to or exceeds the question limit.
         checkEndCondition: function () {
             if (numberOfQuestionsAsked >= this.questionsLimit) {
                 return true;
@@ -179,12 +180,12 @@ $(document).ready(function () {
     var instructionsText = $("#instruction-text");
     var gameDiv = $("#game")
     var timerText = $("#timer");
+    // var songs = ["assets/music/dragonbornsong.mp3", "assets/music/thejerallmountains.mp3", "assets/music/thebanneredmare.mp3"];
 
     const totalTime = 45;
     var currentTime = 0;
     var timerId;
     var clockRunning = false;
-    var gameWon = false;
 
     var buttonClasses = "btn btn-secondary btn-block btn-opacity mt-3";
     var buttonStyle = "font-size: 1.5rem;";
@@ -209,6 +210,11 @@ $(document).ready(function () {
         startButton.click(function () {
             beginGame();
         });
+
+        // <source src="audio/pop.wav" type="audio/mpeg">
+
+        // var randomSong = Math.floor(Math.random() * songs.length);
+        // document.getElementById("#background-music").play();
 
         gameDiv.append(startButton);
     }
@@ -255,7 +261,7 @@ $(document).ready(function () {
     function postQuestion() {
         $(".gif").remove();
         var theQuestion = game.getCurrentQuestion(); // Get the current question.
-        instructionsText.html(theQuestion.question); // Set the instruction text to what the question is.
+        instructionsText.html(theQuestion.question + "<br><br>"); // Set the instruction text to what the question is.
 
         // For each property in theQuestion object (excluding the question itself) add it to an array.
         var answers = [];
@@ -292,10 +298,10 @@ $(document).ready(function () {
 
         // If the chosen answer was the correct one, tell the user it was correct.
         if (theAnswerChosen.innerHTML === theQuestion.correct) {
-            instructionsText.html("That is correct!<br><br>" + theQuestion.correct);
+            instructionsText.html("That is correct!<br><br>" + theQuestion.correct + "<br><br>");
             game.incrementCorrectAnswers();
         } else { // else tell them it was incorrect.
-            instructionsText.html("That is incorrect! The correct answer was:<br><br>" + theQuestion.correct);
+            instructionsText.html("That is incorrect! The correct answer was:<br><br>" + theQuestion.correct + "<br><br>");
             game.incrementIncorrectAnswers();
         }
 
@@ -321,7 +327,7 @@ $(document).ready(function () {
         stopTimer();
         timerText.empty(); // Remove the timer text.
         $("button").remove(); // Remove all buttons from the html.
-        $("img").remove();
+        $(".gif").remove();
 
         // Calculate the number of unanswered questions.
         var unanswered = game.questionsLimit - (game.getCorrectAnswers() + game.getIncorrectAnswers());
