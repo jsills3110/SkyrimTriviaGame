@@ -137,7 +137,6 @@ var SkyrimTrivia = function () {
                     currentQuestion = questions[Math.floor(Math.random() * questions.length)];
                 }
                 numberOfQuestionsAsked++;
-                console.log("Questions asked: " + numberOfQuestionsAsked);
             }
         },
 
@@ -152,13 +151,11 @@ var SkyrimTrivia = function () {
         // Increment the correct answers.
         incrementCorrectAnswers: function () {
             correctAnswers++;
-            console.log("Correct answers: " + correctAnswers);
         },
 
         // Increment the incorrect answers.
         incrementIncorrectAnswers: function () {
             incorrectAnswers++;
-            console.log("Incorrect answers: " + incorrectAnswers);
         },
 
         // Return the currentQuestion.
@@ -200,7 +197,7 @@ $(document).ready(function () {
     function startScreen() {
         currentTime = totalTime;
         $("button").remove(); // Remove all buttons from the html.
-        $("img").remove();
+        $(".gif").remove();
         instructionsText.html("You will have " + currentTime + " seconds to complete " + game.questionsLimit +
             " random questions.<br><br>Press Start to begin the Trivia<br><br>");
 
@@ -256,7 +253,7 @@ $(document).ready(function () {
     // To post a question, get the current question and create a button for each of the answers.
     // Start the timer for the question.
     function postQuestion() {
-        $("img").remove();
+        $(".gif").remove();
         var theQuestion = game.getCurrentQuestion(); // Get the current question.
         instructionsText.html(theQuestion.question); // Set the instruction text to what the question is.
 
@@ -304,6 +301,7 @@ $(document).ready(function () {
 
         var image = $("<img>");
         image.attr("src", theQuestion.gif);
+        image.addClass("gif");
         gameDiv.append(image);
 
         // Wait 5 seconds before posting the next question.
