@@ -78,7 +78,7 @@ var SkyrimTrivia = function () {
             answer2: "Iona",
             answer3: "Valdimar",
             correct: "Lydia",
-            gif: "assets/images/shadowmere.gif",
+            gif: "assets/images/lydia.gif",
         },
         {
             question: "What is Calcelmo's favorite subject of study?",
@@ -180,7 +180,9 @@ $(document).ready(function () {
     var instructionsText = $("#instruction-text");
     var gameDiv = $("#game")
     var timerText = $("#timer");
-    // var songs = ["assets/music/dragonbornsong.mp3", "assets/music/thejerallmountains.mp3", "assets/music/thebanneredmare.mp3"];
+    var songs = ["assets/music/dragonbornsong.mp3", "assets/music/thejerallmountains.mp3", "assets/music/thebanneredmare.mp3"];
+    var currentSong;
+    var myAudio;
 
     const totalTime = 45;
     var currentTime = 0;
@@ -211,10 +213,8 @@ $(document).ready(function () {
             beginGame();
         });
 
-        // <source src="audio/pop.wav" type="audio/mpeg">
-
-        // var randomSong = Math.floor(Math.random() * songs.length);
-        // document.getElementById("#background-music").play();
+        currentSong = songs[Math.floor(Math.random() * songs.length)];
+        myAudio = new Audio(currentSong);
 
         gameDiv.append(startButton);
     }
@@ -223,6 +223,7 @@ $(document).ready(function () {
     function beginGame() {
         instructionsText.empty();
         $("#start-button").remove();
+        myAudio.play();
         game.startGame();
         postQuestion();
     }
@@ -344,6 +345,7 @@ $(document).ready(function () {
         retryButton.attr("style", buttonStyle);
         retryButton.html("Retry");
         retryButton.click(function () {
+            myAudio.pause();
             startScreen();
         });
         gameDiv.append(retryButton);
